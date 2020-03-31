@@ -70,3 +70,13 @@ defineElement(NovaButton, {
   type: 'button' 
 })
 ```
+
+```ts
+const $novaButton = document.createElement('nova-button')
+
+$novaButton.setAttribute('id', 'some-id')
+$novaButton.type = 'primary'
+
+$novaButton.doSomething()
+$novaButton.click()
+```
