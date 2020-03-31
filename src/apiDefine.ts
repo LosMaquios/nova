@@ -4,7 +4,7 @@ import {
   NovaElementInternals,
   NovaFunctionalElementConstructor
 } from './apiInstance'
-import { WatcherHandler } from './watcherHandler'
+import { WatcherHandler } from './WatcherHandler'
 
 export interface DefineOptions {
   tag?: string

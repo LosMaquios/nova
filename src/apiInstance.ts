@@ -1,4 +1,4 @@
-import { WatcherHandler } from './watcherHandler'
+import { WatcherHandler } from './WatcherHandler'
 
 export type NovaElementConnectedCallback = () => void
 export type NovaElementDisconnectedCallback = () => void
