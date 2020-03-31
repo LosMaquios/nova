@@ -1,0 +1,26 @@
+{
+  "name": "nova",
+  "version": "0.1.0",
+  "description": "Composable custom elements",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LosMaquios/nova.git"
+  },
+  "author": "Camilo Rodríguez <aermotiondesign@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LosMaquios/nova/issues"
+  },
+  "homepage": "https://github.com/LosMaquios/nova#readme",
+  "devDependencies": {
+    "@types/jest": "^25.1.4",
+    "jest": "^25.2.4",
+    "jest-environment-jsdom-sixteen": "^1.0.3",
+    "ts-jest": "^25.3.0",
+    "typescript": "^3.8.3"
+  }
+}
