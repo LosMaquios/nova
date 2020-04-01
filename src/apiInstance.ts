@@ -1,4 +1,5 @@
 import { WatcherHandler } from './WatcherHandler'
+import { WatcherCollection } from './WatcherCollection'
 
 export type NovaElementConnectedCallback = () => void
 export type NovaElementDisconnectedCallback = () => void
@@ -21,9 +22,6 @@ export interface NovaElementCallbacks {
   attributeChanged: NovaElementAttributeChangedCallback[]
 }
 
-export type NovaElementWatchedAttrs = Map<string, WatcherHandler>
-export type NovaElementWatchedProps = Map<PropertyKey, WatcherHandler>
-
 export interface NovaElementInternals {
   /**
    * Nova assigned ID
@@ -31,8 +29,8 @@ export interface NovaElementInternals {
   __id: string
   __mutationObserver: MutationObserver
   __constructor: NovaFunctionalElementConstructor
-  __watchedAttrs: NovaElementWatchedAttrs
-  __watchedProps: NovaElementWatchedProps
+  __watchedAttrs: WatcherCollection
+  __watchedProps: WatcherCollection
   __callbacks: NovaElementCallbacks
 
   __registerWatchedAttr: (attr: string) => WatcherHandler

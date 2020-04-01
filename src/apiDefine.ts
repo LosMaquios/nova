@@ -5,6 +5,7 @@ import {
   NovaFunctionalElementConstructor
 } from './apiInstance'
 import { WatcherHandler } from './WatcherHandler'
+import { WatcherCollection } from './WatcherCollection'
 
 export interface DefineOptions {
   tag?: string
@@ -52,8 +53,8 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
     __id: string
     __mutationObserver: MutationObserver
     __constructor = FunctionalElementConstructor
-    __watchedAttrs = new Map()
-    __watchedProps = new Map()
+    __watchedAttrs = new WatcherCollection()
+    __watchedProps = new WatcherCollection()
     __callbacks = {
       connected: [],
       disconnected: [],
@@ -104,12 +105,6 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
     }
 
     __registerWatchedAttr (attr) {
-      if (this.__watchedAttrs.has(attr)) {
-        return this.__watchedAttrs.get(attr)
-      }
-      
-      const watcherHandler = new WatcherHandler()
-
       /**
        * 
         this.__attachCallback('attributeChanged', ([name, oldValue, newValue, domain]) => {
@@ -119,32 +114,25 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
         })
        */
 
-      this.__watchedAttrs.set(attr, watcherHandler)
-      return watcherHandler
+      return this.__watchedAttrs.get(attr)
     }
 
     __registerWatchedProp (prop, defaultValue) {
-      if (this.__watchedProps.has(prop)) {
-        return this.__watchedProps.get(prop)
-      }
+      return this.__watchedProps.get(prop, watcherHandler => {
+        let currentValue: any = prop in this ? this[prop] : defaultValue
 
-      let currentValue: any = prop in this ? this[prop] : defaultValue
-      const watcherHandler = new WatcherHandler()
-
-      Object.defineProperty(this, prop, {
-        get () {
-          return currentValue
-        },
-        set (newValue) {
-          if (currentValue !== newValue) {
-            const oldValue = currentValue
-            watcherHandler.run(currentValue = newValue, oldValue)
+        Object.defineProperty(this, prop, {
+          get () {
+            return currentValue
+          },
+          set (newValue) {
+            if (currentValue !== newValue) {
+              const oldValue = currentValue
+              watcherHandler.run(currentValue = newValue, oldValue)
+            }
           }
-        }
+        })
       })
-
-      this.__watchedProps.set(prop, watcherHandler)
-      return watcherHandler
     }
 
     __attachCallback (callbackName, fn) {
