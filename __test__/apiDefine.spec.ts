@@ -1,4 +1,4 @@
-import { defineElement } from '../src/index'
+import { defineElement } from '../src'
 
 describe('api: defineElement', () => {
   test('simple definition', () => {

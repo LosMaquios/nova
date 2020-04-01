@@ -50,6 +50,7 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
 
   class NovaElement extends HTMLConstructor implements NovaElementInternals {
     __id: string
+    __mutationObserver: MutationObserver
     __constructor = FunctionalElementConstructor
     __watchedAttrs = new Map()
     __watchedProps = new Map()
@@ -65,9 +66,25 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
 
       this.__id = genCustomElementID()
 
-      setElementInstance(this as any)      
+      this.__mutationObserver = new MutationObserver(this.__handleMutations)
+      this.__mutationObserver.observe(this as any, {
+        attributes: true,
+        attributeOldValue: true
+      })
+
+      setElementInstance(this as any)
       FunctionalElementConstructor()
       setElementInstance(null)
+    }
+
+    __handleMutations: MutationCallback = mutations => {
+      for (const { attributeName, oldValue } of mutations) {
+        const watcherHandler = this.__watchedAttrs.get(attributeName)
+
+        if (watcherHandler) {
+          watcherHandler.run(this.getAttribute(attributeName), oldValue)
+        }
+      }
     }
 
     connectedCallback () {
@@ -93,12 +110,16 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
       
       const watcherHandler = new WatcherHandler()
 
-      this.__attachCallback('attributeChanged', ([name, oldValue, newValue, domain]) => {
-        if (name === attr) {
-          watcherHandler.run(newValue, oldValue, domain)
-        }
-      })
+      /**
+       * 
+        this.__attachCallback('attributeChanged', ([name, oldValue, newValue, domain]) => {
+          if (name === attr) {
+            watcherHandler.run(newValue, oldValue, domain)
+          }
+        })
+       */
 
+      this.__watchedAttrs.set(attr, watcherHandler)
       return watcherHandler
     }
 
@@ -122,6 +143,7 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
         }
       })
 
+      this.__watchedProps.set(prop, watcherHandler)
       return watcherHandler
     }
 

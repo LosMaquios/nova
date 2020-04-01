@@ -27,14 +27,8 @@ export function attr (name: string, allowWatch = true) {
   }
 
   if (allowWatch) {
-    const watcherHandler = new WatcherHandler()
-    result.watch = (watcher: Watcher) => watcherHandler.addWatcher(watcher)
-
-    onAttributeChanged((_name, oldValue, newValue, domain) => {
-      if (name === _name) {
-        watcherHandler.run(oldValue, newValue, domain)
-      }
-    })
+    const watcherHandler = instance.__registerWatchedAttr(name)
+    result.watch = watcherHandler.addWatcher.bind(watcherHandler)
   }
 
   return result

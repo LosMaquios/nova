@@ -29,6 +29,7 @@ export interface NovaElementInternals {
    * Nova assigned ID
    */
   __id: string
+  __mutationObserver: MutationObserver
   __constructor: NovaFunctionalElementConstructor
   __watchedAttrs: NovaElementWatchedAttrs
   __watchedProps: NovaElementWatchedProps

@@ -16,5 +16,8 @@ describe('api: instance', () => {
 
     document.createElement('test-element-instance')
     await customElements.whenDefined('test-element-instance')
+
+    // wrong instance call
+    expect(() => getElementInstance()).toThrowError('Unknown instance')
   })
 })
