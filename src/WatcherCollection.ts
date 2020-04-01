@@ -15,8 +15,6 @@ export class WatcherCollection {
     }
   
     this.collection.set(name, watcherHandler)
-
-
     return watcherHandler
   }
 }
