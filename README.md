@@ -2,6 +2,8 @@
 
   Microframework for composable custom-elements
 
+[![LosMaquios](https://circleci.com/gh/LosMaquios/nova.svg?style=svg)](https://circleci.com/gh/LosMaquios/nova)
+
 ## Example
 
 ```ts
