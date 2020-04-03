@@ -102,7 +102,6 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
     }
 
     attributeChangedCallback (...args) {
-      console.log('Attr changed:', ...args)
       this.__dispatchCallback('attributeChanged', args)
     }
 
