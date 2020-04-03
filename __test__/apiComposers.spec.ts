@@ -7,7 +7,8 @@ import {
   onDisconnected, 
   onAttributeChanged,
   defineElement,
-  getElementInstance
+  getElementInstance,
+  onAdopted
 } from '../src'
 import { runInInstance } from './utils'
 
@@ -114,4 +115,21 @@ describe('api: composers', () => {
     defineElement(TestAttributeChanged, { observedAttributes: ['id'] })
     document.createElement('test-attribute-changed')
   })
+
+  test('composer `onAdopted`', runInInstance((instance, done) => {
+    const currentDocument = instance.ownerDocument
+    const nextDocument = document.implementation.createHTMLDocument()
+
+    onAdopted((oldDocument, newDocument) => {
+      expect(oldDocument).toBe(currentDocument)
+      expect(newDocument).toBe(nextDocument)
+      expect(instance.ownerDocument).toBe(nextDocument)
+
+      done()
+    })
+
+    setTimeout(() => {
+      nextDocument.adoptNode(instance)
+    })
+  }))
 })
