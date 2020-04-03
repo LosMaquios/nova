@@ -51,21 +51,36 @@ describe('api: composers', () => {
   test('composer `method`', runInInstance((instance, done) => {
     const toggleSpy = jest.fn()
     const toggle = method('toggle', toggleSpy)
+    const setAttribute = method('setAttribute')
 
     toggle()
-    ;(instance as any).toggle()
 
-    expect(toggleSpy).toBeCalledTimes(2)
-    done()
+    expect(() => method('unknownMethod')).toThrowError('Unknown method: unknownMethod')
+
+    setTimeout(() => {
+      setAttribute('id', 'test')
+  
+      ;(instance as any).toggle()
+  
+      expect(instance.getAttribute('id')).toBe('test')
+      expect(toggleSpy).toBeCalledTimes(2)
+      done()
+    })
   }))
 
   test('composer `on`', runInInstance((instance, done) => {
     const listenerSpy = jest.fn()
     const event = new CustomEvent('test', { detail: { a: 'b' } })
 
-    on('test' as any, listenerSpy)
+    const off = on('test' as any, e => {
+      listenerSpy(e)
+      off()
+    })
+
+    instance.dispatchEvent(event)
     instance.dispatchEvent(event)
 
+    expect(listenerSpy).toBeCalledTimes(1)
     expect(listenerSpy).toBeCalledWith(event)
     done()
   }))

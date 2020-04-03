@@ -20,6 +20,7 @@
   "homepage": "https://github.com/LosMaquios/nova#readme",
   "devDependencies": {
     "@types/jest": "^25.1.4",
+    "codecov": "^3.6.5",
     "jest": "^25.2.4",
     "jest-environment-jsdom-sixteen": "^1.0.3",
     "ts-jest": "^25.3.0",
