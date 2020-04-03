@@ -60,12 +60,7 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
     __constructor = FunctionalElementConstructor
     __watchedAttrs = new WatcherCollection()
     __watchedProps = new WatcherCollection()
-    __callbacks = {
-      connected: [],
-      disconnected: [],
-      adopted: [],
-      attributeChanged: []
-    }
+    __callbacks = new WatcherCollection<keyof NovaElementCallbacks>()
 
     constructor () {
       super()
@@ -141,21 +136,11 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
     }
 
     __attachCallback (callbackName, fn) {
-      const callbacks = this.__callbacks[callbackName]
-
-      callbacks.push(fn)
-
-      return () => {
-        callbacks.splice(callbacks.indexOf(fn), 1)
-      }
+      return this.__callbacks.get(callbackName).addWatcher(fn)
     }
 
     private __dispatchCallback (callbackName: keyof NovaElementCallbacks, args: any[] = []) {
-      const callbacks = this.__callbacks[callbackName]
-
-      for (const callback of callbacks) {
-        callback(...args)
-      }
+      this.__callbacks.get(callbackName).run(...args)
     }
   }
 

@@ -1,9 +1,9 @@
 import { WatcherHandler } from './WatcherHandler'
 
-export class WatcherCollection {
-  collection = new Map<string, WatcherHandler>()
+export class WatcherCollection<K = string> {
+  collection = new Map<K, WatcherHandler>()
 
-  get (name: string, setup?: (watcherHandler: WatcherHandler) => void) {
+  get (name: K, setup?: (watcherHandler: WatcherHandler) => void) {
     if (this.collection.has(name)) {
       return this.collection.get(name)
     }

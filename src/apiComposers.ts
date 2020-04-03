@@ -95,7 +95,7 @@ export function on (
 }
 
 function getCallbackComposer<T extends keyof NovaElementCallbacks> (callbackName: T) {
-  return (fn: NovaElementCallbacks[T][number]) => {
+  return (fn: NovaElementCallbacks[T]) => {
     const instance = getElementInstance()
 
     return instance.__attachCallback(callbackName, fn)

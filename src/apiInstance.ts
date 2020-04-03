@@ -16,10 +16,10 @@ export interface NovaFunctionalElementConstructor {
 }
 
 export interface NovaElementCallbacks {
-  connected: NovaElementConnectedCallback[]
-  disconnected: NovaElementDisconnectedCallback[]
-  adopted: NovaElementAdoptedCallback[]
-  attributeChanged: NovaElementAttributeChangedCallback[]
+  connected: NovaElementConnectedCallback
+  disconnected: NovaElementDisconnectedCallback
+  adopted: NovaElementAdoptedCallback
+  attributeChanged: NovaElementAttributeChangedCallback
 }
 
 export interface NovaElementInternals {
@@ -31,11 +31,11 @@ export interface NovaElementInternals {
   __constructor: NovaFunctionalElementConstructor
   __watchedAttrs: WatcherCollection
   __watchedProps: WatcherCollection
-  __callbacks: NovaElementCallbacks
+  __callbacks: WatcherCollection<keyof NovaElementCallbacks>
 
   __registerWatchedAttr: (attr: string) => WatcherHandler
   __registerWatchedProp: (prop: PropertyKey, defaultValue?: any) => WatcherHandler
-  __attachCallback: <T extends keyof NovaElementCallbacks>(callbackName: T, fn: NovaElementCallbacks[T][number]) => () => void
+  __attachCallback: <T extends keyof NovaElementCallbacks>(callbackName: T, fn: NovaElementCallbacks[T]) => () => void
   connectedCallback: NovaElementConnectedCallback
   disconnectedCallback: NovaElementDisconnectedCallback
   adoptedCallback: NovaElementAdoptedCallback
