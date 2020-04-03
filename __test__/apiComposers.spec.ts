@@ -1,35 +1,96 @@
-import { defineElement, attr } from '../src'
+import { 
+  attr, 
+  prop, 
+  method, 
+  on, 
+  onConnected, 
+  onDisconnected, 
+  onAttributeChanged 
+} from '../src'
+import { runInInstance } from './utils'
 
 describe('api: composers', () => {
-  test('composer `attr`', done => {
-    function TestComposerAttr () {
-      const id = attr('id')
+  test('composer `attr`', runInInstance((instance, done) => {
+    const id = attr('id')
+    const NEW_ID = 'some-id'
 
-      expect(id.value).toBeNull()
+    expect(id.value).toBeNull()
 
-      id.watch((newID, oldID) => {
-        expect(oldID).toBeNull()
-        expect(newID).toBe('some-id')
-        done()
-      })
+    id.watch((newID, oldID) => {
+      expect(oldID).toBeNull()
+      expect(newID).toBe(NEW_ID)
+      expect(instance.getAttribute('id')).toBe(NEW_ID)
+      done()
+    })
 
-      setTimeout(() => {
-        id.value = 'some-id'
-      })
-    }
+    setTimeout(() => {
+      id.value = NEW_ID
+    })
+  }))
 
-    defineElement(TestComposerAttr)
+  test('composer `prop`', runInInstance((instance, done) => {
+    const active = prop('active', false)
+    const NEW_ACTIVE = true
 
-    document.createElement('test-composer-attr')
-  })
-  test.todo('composer `prop`')
-  test.todo('composer `method`')
-  test.todo('composer `on`')
+    expect(active.value).toBe(false)
+    expect((instance as any).active).toBe(false)
+
+    active.watch((newActive, oldActive) => {
+      expect(oldActive).toBe(false)
+      expect(newActive).toBe(NEW_ACTIVE)
+      expect((instance as any).active).toBe(NEW_ACTIVE)
+      done()
+    })
+
+    active.value = true
+  }))
+
+  test('composer `method`', runInInstance((instance, done) => {
+    const toggleSpy = jest.fn()
+    const toggle = method('toggle', toggleSpy)
+
+    toggle()
+    ;(instance as any).toggle()
+
+    expect(toggleSpy).toBeCalledTimes(2)
+    done()
+  }))
+
+  test('composer `on`', runInInstance((instance, done) => {
+    const listenerSpy = jest.fn()
+    const event = new CustomEvent('test', { detail: { a: 'b' } })
+
+    on('test' as any, listenerSpy)
+    instance.dispatchEvent(event)
+
+    expect(listenerSpy).toBeCalledWith(event)
+    done()
+  }))
 
   /**
    * CE callbacks
    */
-  test.todo('composer `onConnected`')
-  test.todo('composer `onDisconnected`')
+  test('composer `onConnected`', runInInstance((instance, done) => {
+    onConnected(done)
+
+    setTimeout(() => {
+      document.body.append(instance)
+    })
+  }))
+
+  test('composer `onDisconnected`', runInInstance((instance, done) => {
+    onDisconnected(done)
+
+    setTimeout(() => {
+      const { body } = document
+
+      body.append(instance)
+
+      setTimeout(() => {
+        body.removeChild(instance)
+      })
+    })
+  }))
+
   test.todo('composer `onAttributeChanged`')
 })
