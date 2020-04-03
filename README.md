@@ -3,6 +3,7 @@
   Microframework for composable custom-elements
 
 [![LosMaquios](https://circleci.com/gh/LosMaquios/nova.svg?style=svg)](https://circleci.com/gh/LosMaquios/nova)
+[![LosMaquios](https://codecov.io/github/LosMaquios/nova/coverage.svg?branch=master)](https://codecov.io/github/LosMaquios/nova)
 
 ## Example
 
