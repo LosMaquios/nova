@@ -4,12 +4,12 @@ import {
   NovaElementInternals,
   NovaFunctionalElementConstructor
 } from './apiInstance'
-import { WatcherHandler } from './WatcherHandler'
 import { WatcherCollection } from './WatcherCollection'
 
 export interface DefineOptions {
   tag?: string
   type?: keyof HTMLElementTagNameMap
+  observedAttributes?: string[]
 }
 
 let novaElementID = 0
@@ -41,7 +41,8 @@ function toKebabCase (str: string) {
 
 function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
   type: T, 
-  FunctionalElementConstructor: NovaFunctionalElementConstructor
+  FunctionalElementConstructor: NovaFunctionalElementConstructor,
+  observedAttributes: string[]
 ): any {
   let HTMLConstructor: any = HTMLElement
 
@@ -50,6 +51,10 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
   }
 
   class NovaElement extends HTMLConstructor implements NovaElementInternals {
+    static get observedAttributes () {
+      return observedAttributes
+    }
+
     __id: string
     __mutationObserver: MutationObserver
     __constructor = FunctionalElementConstructor
@@ -97,6 +102,7 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
     }
 
     attributeChangedCallback (...args) {
+      console.log('Attr changed:', ...args)
       this.__dispatchCallback('attributeChanged', args)
     }
 
@@ -158,11 +164,11 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
 }
 
 export function defineElement (FunctionalElementConstructor: NovaFunctionalElementConstructor, options: DefineOptions = {}) {
-  const { tag, type } = options
+  const { tag, type, observedAttributes = [] } = options
 
   const defineArgs: [any, any] = [
     tag ?? toKebabCase(FunctionalElementConstructor.name), 
-    getCustomElementConstructor(type, FunctionalElementConstructor)
+    getCustomElementConstructor(type, FunctionalElementConstructor, observedAttributes)
   ]
 
   if (type) {

@@ -3,7 +3,6 @@ import {
   getElementInstance,
   NovaElementInstance
 } from './apiInstance'
-import { WatcherHandler, Watcher } from './WatcherHandler'
 
 export type NovaElementMethodDefinition = (...args: unknown[]) => unknown
 export type NovaElementMethodDefinitionBound = (this: NovaElementInstance<any>, ...args: unknown[]) => unknown

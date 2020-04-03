@@ -5,7 +5,9 @@ import {
   on, 
   onConnected, 
   onDisconnected, 
-  onAttributeChanged 
+  onAttributeChanged,
+  defineElement,
+  getElementInstance
 } from '../src'
 import { runInInstance } from './utils'
 
@@ -92,5 +94,24 @@ describe('api: composers', () => {
     })
   }))
 
-  test.todo('composer `onAttributeChanged`')
+  test('composer `onAttributeChanged`', done => {
+    function TestAttributeChanged () {
+      const instance = getElementInstance()
+
+      onAttributeChanged((name, oldValue, newValue) => {
+        expect(name).toBe('id')
+        expect(oldValue).toBeNull()
+        expect(newValue).toBe('some-id')
+
+        done()
+      })
+
+      setTimeout(() => {
+        instance.setAttribute('id', 'some-id')
+      })
+    }
+
+    defineElement(TestAttributeChanged, { observedAttributes: ['id'] })
+    document.createElement('test-attribute-changed')
+  })
 })
