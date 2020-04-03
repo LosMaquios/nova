@@ -1,25 +1,35 @@
-import {
-  getElementInstance, 
-  defineElement 
-} from '../src'
+import { getElementInstance } from '../src'
+import { runInInstance } from './utils'
 
 describe('api: instance', () => {
-  test('get instance', done => {
-    function TestElementInstance () {
-      const instance = getElementInstance()
+  test('get instance', runInInstance((instance, done) => {
+    // We're calling `getElementInstance` internally
+    // in `runInInstance` definition
 
-      expect(typeof instance.__id).toBe('string')
-      expect(instance.__constructor).toBe(TestElementInstance)
+    expect(typeof instance.__id).toBe('string')
+    expect(typeof instance.__constructor).toBe('function')
 
-      done()
+    done()
+  }))
+
+  test('wrong get instance call', done => {
+    const UNKNOWN_INSTANCE_ERROR_MSG = 'Unknown instance'
+
+    const expectInstanceError = () => {
+      expect(() => getElementInstance()).toThrowError(UNKNOWN_INSTANCE_ERROR_MSG)
     }
 
-    defineElement(TestElementInstance)
-    document.createElement('test-element-instance')
-  })
+    // At root level
+    expectInstanceError()
 
-  test('wrong get instance call', () => {
-    // wrong instance call
-    expect(() => getElementInstance()).toThrowError('Unknown instance')
+    runInInstance((_, done) => {
+      expect(() => getElementInstance).not.toThrowError(UNKNOWN_INSTANCE_ERROR_MSG)
+
+      setTimeout(() => {
+        // `delayed`
+        expectInstanceError()
+        done()
+      })
+    })(done)
   })
 })
