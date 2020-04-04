@@ -19,6 +19,7 @@ function getElementConstructorFromType<
   T extends keyof HTMLElementTagNameMap,
   K extends HTMLElementTagNameMap[T]
 > (type: T): K {
+  /* istanbul ignore next */
   if (constructorCache.has(type)) {
     return constructorCache.get(type) as K
   }
@@ -80,10 +81,10 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
 
     __handleMutations: MutationCallback = mutations => {
       for (const { attributeName, oldValue } of mutations) {
-        const watcherHandler = this.__watchedAttrs.get(attributeName)
-
-        if (watcherHandler) {
-          watcherHandler.run(this.getAttribute(attributeName), oldValue)
+        if (this.__watchedAttrs.has(attributeName)) {
+          this.__watchedAttrs
+            .forceGet(attributeName)
+            .run(this.getAttribute(attributeName), oldValue)
         }
       }
     }
@@ -126,6 +127,7 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
             return currentValue
           },
           set (newValue) {
+            /* istanbul ignore else */
             if (currentValue !== newValue) {
               const oldValue = currentValue
               watcherHandler.run(currentValue = newValue, oldValue)

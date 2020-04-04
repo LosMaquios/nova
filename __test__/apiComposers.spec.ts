@@ -32,9 +32,11 @@ describe('api: composers', () => {
   }))
 
   test('composer `prop`', runInInstance((instance, done) => {
+    const tagName = prop('tagName', 'non-tag')
     const active = prop('active', false)
     const NEW_ACTIVE = true
 
+    expect(tagName).not.toBe('non-tag')
     expect(active.value).toBe(false)
     expect((instance as any).active).toBe(false)
 
