@@ -117,18 +117,26 @@ describe('api: composers', () => {
 
   test('composer `onAttributeChanged`', done => {
     function TestAttributeChanged () {
+      let unwatchChanged
+      
       const instance = getElementInstance()
+      const attributeChangedSpy = jest.fn(() => unwatchChanged())
 
-      onAttributeChanged((name, oldValue, newValue) => {
-        expect(name).toBe('id')
-        expect(oldValue).toBeNull()
-        expect(newValue).toBe('some-id')
-
-        done()
-      })
+      unwatchChanged = onAttributeChanged(attributeChangedSpy)
 
       setTimeout(() => {
         instance.setAttribute('id', 'some-id')
+
+        expect(attributeChangedSpy).toBeCalledWith(
+          'id', // name
+          null, // oldValue
+          'some-id', // newValue
+          null // domain
+        )
+
+        instance.setAttribute('id', 'not-tracked-id')
+        expect(attributeChangedSpy).toBeCalledTimes(1)
+        done()
       })
     }
 
