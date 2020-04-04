@@ -50,17 +50,22 @@ describe('api: composers', () => {
 
   test('composer `method`', runInInstance((instance, done) => {
     const toggleSpy = jest.fn()
+    const doSomethingSpy = jest.fn()
+    const doSomething = () => doSomethingSpy()
     const toggle = method('toggle', toggleSpy)
     const setAttribute = method('setAttribute')
+    method(doSomething)
 
     toggle()
+    
 
     expect(() => method('unknownMethod')).toThrowError('Unknown method: unknownMethod')
 
     setTimeout(() => {
       setAttribute('id', 'test')
-  
+
       ;(instance as any).toggle()
+      ;(instance as any).doSomething()
   
       expect(instance.getAttribute('id')).toBe('test')
       expect(toggleSpy).toBeCalledTimes(2)

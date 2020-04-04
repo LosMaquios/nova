@@ -54,6 +54,9 @@ export function method (
 
   if (typeof methodNameOrFn === 'string') {
     methodName = methodNameOrFn
+  } else {
+    methodName = methodNameOrFn.name
+    fn = methodNameOrFn
   }
 
   if (!fn) {
@@ -65,7 +68,6 @@ export function method (
   }
 
   instance[methodName] = fn
-
   return fn.bind(instance)
 }
 
