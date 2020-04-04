@@ -12,25 +12,19 @@ export const onDisconnected = getCallbackComposer('disconnected')
 export const onAttributeChanged = getCallbackComposer('attributeChanged')
 export const onAdopted = getCallbackComposer('adopted')
 
-export function attr (name: string, allowWatch = true) {
+export function attr (name: string) {
   const instance = getElementInstance()
+  const watcherHandler = instance.__registerWatchedAttr(name)
 
-  const result = {
+  return {
     get value () {
       return instance.getAttribute(name)
     },
     set value (newValue: string) {
       instance.setAttribute(name, newValue)
     },
-    watch: null
+    watch: watcherHandler.addWatcher.bind(watcherHandler)
   }
-
-  if (allowWatch) {
-    const watcherHandler = instance.__registerWatchedAttr(name)
-    result.watch = watcherHandler.addWatcher.bind(watcherHandler)
-  }
-
-  return result
 }
 
 export function prop (name: PropertyKey, defaultValue?: any) {
