@@ -23,7 +23,7 @@ describe('api: instance', () => {
     expectInstanceError()
 
     runInInstance((_, done) => {
-      expect(() => getElementInstance).not.toThrowError(UNKNOWN_INSTANCE_ERROR_MSG)
+      expect(() => getElementInstance()).not.toThrowError(UNKNOWN_INSTANCE_ERROR_MSG)
 
       setTimeout(() => {
         // `delayed`
