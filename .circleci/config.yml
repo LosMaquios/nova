@@ -11,7 +11,6 @@ jobs:
           steps:
             - run: npm install
             - run: npm run test:ci
-            - run: npm run test:cov
             - run: ./node_modules/.bin/codecov
 workflows:
   build-and-test:

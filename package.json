@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "test:ci": "jest --ci --runInBand",
-    "test:cov": "jest --coverage"
+    "test:ci": "jest --ci --runInBand --coverage"
   },
   "repository": {
     "type": "git",
