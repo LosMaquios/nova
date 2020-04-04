@@ -36,7 +36,7 @@ describe('api: composers', () => {
     const active = prop('active', false)
     const NEW_ACTIVE = true
 
-    expect(tagName).not.toBe('non-tag')
+    expect(tagName.value).not.toBe('non-tag')
     expect(active.value).toBe(false)
     expect((instance as any).active).toBe(false)
 
