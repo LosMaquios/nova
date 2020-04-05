@@ -1,10 +1,14 @@
 {
   "name": "@losmaquios/nova",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Composable custom elements",
   "main": "./dist/nova.umd.js",
   "module": "./dist/nova.esm.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "test": "jest",
     "test:ci": "jest --ci --runInBand --coverage",
