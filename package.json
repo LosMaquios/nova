@@ -1,11 +1,14 @@
 {
-  "name": "nova",
+  "name": "@losmaquios/nova",
   "version": "0.1.0",
   "description": "Composable custom elements",
-  "main": "index.js",
+  "main": "./dist/nova.umd.js",
+  "module": "./dist/nova.esm.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "jest",
-    "test:ci": "jest --ci --runInBand --coverage"
+    "test:ci": "jest --ci --runInBand --coverage",
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -22,6 +25,8 @@
     "codecov": "^3.6.5",
     "jest": "^25.2.4",
     "jest-environment-jsdom-sixteen": "^1.0.3",
+    "rollup": "^2.3.2",
+    "rollup-plugin-typescript2": "^0.27.0",
     "ts-jest": "^25.3.0",
     "typescript": "^3.8.3"
   }

@@ -5,6 +5,12 @@
 [![LosMaquios](https://circleci.com/gh/LosMaquios/nova.svg?style=svg)](https://circleci.com/gh/LosMaquios/nova)
 [![LosMaquios](https://codecov.io/github/LosMaquios/nova/coverage.svg?branch=master)](https://codecov.io/github/LosMaquios/nova)
 
+## Installation
+
+```bash
+$ npm install @losmaquios/nova
+```
+
 ## Example
 
 ```ts
@@ -22,7 +28,7 @@ import {
 
   // Register functional custom element
   defineElement
-} from 'nova'
+} from '@losmaquios/nova'
 
 function NovaButton () {
   const id = attr('id')

@@ -1,10 +1,12 @@
 {
   "$schema": "http://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "module": "UMD",
+    "outDir": "./dist",
+    "module": "ES2015",
     "target": "ES2015",
     "downlevelIteration": true,
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "declaration": true
   }
 }
