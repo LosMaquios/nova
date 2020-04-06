@@ -1,19 +1,13 @@
 import { WatcherHandler } from './WatcherHandler'
 
-export class WatcherCollection<K = string> {
-  collection = new Map<K, WatcherHandler>()
-
-  has (name: K) {
-    return this.collection.has(name)
-  }
-
+export class WatcherCollection<K = string> extends Map<K, WatcherHandler> {
   forceGet (name: K) {
-    return this.collection.get(name)
+    return super.get(name)
   }
 
   get (name: K, setup?: (watcherHandler: WatcherHandler) => void) {
-    if (this.collection.has(name)) {
-      return this.collection.get(name)
+    if (super.has(name)) {
+      return super.get(name)
     }
 
     const watcherHandler = new WatcherHandler()
@@ -21,8 +15,8 @@ export class WatcherCollection<K = string> {
     if (setup) {
       setup(watcherHandler)
     }
-  
-    this.collection.set(name, watcherHandler)
+
+    super.set(name, watcherHandler)
     return watcherHandler
   }
 }
