@@ -8,5 +8,5 @@ export * from './apiComposers'
 export * from './apiDefine'
 
 // Expose internal watcher utils
-export { WatcherHandler } from './WatcherHandler'
+export * from './WatcherHandler'
 export { WatcherCollection } from './WatcherCollection'

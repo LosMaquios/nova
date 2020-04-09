@@ -1,18 +1,16 @@
 export type Watcher = (...args: unknown[]) => any
 
-export class WatcherHandler {
-  watchers = new Set<Watcher>()
-
+export class WatcherHandler extends Set<Watcher> {
   addWatcher (watcher: Watcher) {
-    this.watchers.add(watcher)
+    super.add(watcher)
 
     return () => {
-      this.watchers.delete(watcher)
+      super.delete(watcher)
     }
   }
 
   run (...args: unknown[]) {
-    for (const watcher of this.watchers) {
+    for (const watcher of this) {
       watcher(...args)
     }
   }
