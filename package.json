@@ -1,6 +1,6 @@
 {
   "name": "@losmaquios/nova",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Composable custom elements",
   "main": "./dist/nova.umd.js",
   "module": "./dist/nova.esm.js",
