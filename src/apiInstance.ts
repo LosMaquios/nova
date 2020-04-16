@@ -61,7 +61,7 @@ export function setElementInstance<T extends keyof HTMLElementTagNameMap> (insta
 export function context<T extends (...args: unknown[]) => any> (fn: T): T {
   const currentContext = getElementInstance()
 
-  const wrapper = (...args: unknown[]): any => {
+  const wrapper = function (...args: unknown[]): any {
     let prevInstance = null
 
     try {
@@ -71,7 +71,7 @@ export function context<T extends (...args: unknown[]) => any> (fn: T): T {
     }
 
     setElementInstance(currentContext)
-    const result = fn(...args)
+    const result = fn.call(this, ...args)
     setElementInstance(prevInstance)
 
     return result
