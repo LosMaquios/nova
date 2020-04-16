@@ -65,11 +65,10 @@ export function method (
       throw new Error(`Unknown method: ${methodName}`)
     }
 
-    return context(instance[methodName].bind(instance))
+    return instance[methodName].bind(instance)
   }
 
-  instance[methodName] = fn
-  return context(fn.bind(instance))
+  return (instance[methodName] = context(fn)).bind(instance)
 }
 
 export function on <K extends keyof HTMLElementEventMap>(
