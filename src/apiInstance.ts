@@ -57,3 +57,25 @@ export function getElementInstance<T extends keyof HTMLElementTagNameMap> (): No
 export function setElementInstance<T extends keyof HTMLElementTagNameMap> (instance: NovaElementInstance<T> | null) {
   currentElementInstance = instance
 }
+
+export function context<T extends (...args: unknown[]) => any> (fn: T): T {
+  const currentContext = getElementInstance()
+
+  const wrapper = (...args: unknown[]): any => {
+    let prevInstance = null
+
+    try {
+      prevInstance = getElementInstance()
+    } catch (err) {
+      // Ignore "Unknown instance" error
+    }
+
+    setElementInstance(currentContext)
+    const result = fn(...args)
+    setElementInstance(prevInstance)
+
+    return result
+  }
+
+  return wrapper as any
+}

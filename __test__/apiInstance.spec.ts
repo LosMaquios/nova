@@ -1,4 +1,4 @@
-import { getElementInstance } from '../src'
+import { getElementInstance, context } from '../src'
 import { runInInstance } from './utils'
 
 describe('api: instance', () => {
@@ -32,4 +32,13 @@ describe('api: instance', () => {
       })
     })(done)
   })
+
+  test('should preserve instance', runInInstance((instance, done) => {
+    const runExpectations = context(() => {
+      expect(getElementInstance()).toBe(instance)
+      done()
+    })
+
+    setTimeout(runExpectations, 100)
+  }))
 })
