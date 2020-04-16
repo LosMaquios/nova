@@ -84,6 +84,7 @@ export function on (
 ): () => void {
   const instance = getElementInstance()
 
+  /* istanbul ignore next */
   if (typeof listener === 'object') {
     listener = listener.handleEvent.bind(listener)
   }
