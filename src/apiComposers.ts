@@ -1,7 +1,8 @@
 import { 
   NovaElementCallbacks, 
   getElementInstance,
-  NovaElementInstance
+  NovaElementInstance,
+  context
 } from './apiInstance'
 
 export type NovaElementMethodDefinition = (...args: unknown[]) => unknown
@@ -64,11 +65,11 @@ export function method (
       throw new Error(`Unknown method: ${methodName}`)
     }
 
-    return instance[methodName].bind(instance)
+    return context(instance[methodName].bind(instance))
   }
 
   instance[methodName] = fn
-  return fn.bind(instance)
+  return context(fn.bind(instance))
 }
 
 export function on <K extends keyof HTMLElementEventMap>(
@@ -83,6 +84,11 @@ export function on (
 ): () => void {
   const instance = getElementInstance()
 
+  if (typeof listener === 'object') {
+    listener = listener.handleEvent.bind(listener)
+  }
+
+  listener = context(listener as any)
   instance.addEventListener(type, listener, options)
 
   return () => {
@@ -94,6 +100,6 @@ function getCallbackComposer<T extends keyof NovaElementCallbacks> (callbackName
   return (fn: NovaElementCallbacks[T]) => {
     const instance = getElementInstance()
 
-    return instance.__attachCallback(callbackName, fn)
+    return instance.__attachCallback(callbackName, context(fn))
   }
 }
