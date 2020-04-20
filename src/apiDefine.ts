@@ -12,6 +12,8 @@ export interface DefineOptions {
   observedAttributes?: string[]
 }
 
+const { hasOwnProperty } = Object.prototype
+
 let novaElementID = 0
 const constructorCache = new Map<string, HTMLElementTagNameMap[keyof HTMLElementTagNameMap]>()
 
@@ -38,6 +40,10 @@ function genCustomElementID () {
 
 function toKebabCase (str: string) {
   return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+}
+
+function hasChanged (oldValue: any, newValue: any) {
+  return oldValue !== newValue && (oldValue === oldValue || newValue === newValue)
 }
 
 function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
@@ -120,20 +126,73 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
 
     __registerWatchedProp (prop, defaultValue) {
       return this.__watchedProps.get(prop, watcherHandler => {
-        let currentValue: any = prop in this ? this[prop] : defaultValue
+        let currentValue: any = defaultValue
 
-        Object.defineProperty(this, prop, {
+        const setter: PropertyDescriptor['set'] = newValue => {
+          /* istanbul ignore else */
+          if (hasChanged(currentValue, newValue)) {
+            const oldValue = currentValue
+            watcherHandler.run(currentValue = newValue, oldValue)
+          }
+        }
+
+        const descriptor: PropertyDescriptor = {
+          configurable: true,
+          enumerable: true,
           get () {
             return currentValue
           },
-          set (newValue) {
-            /* istanbul ignore else */
-            if (currentValue !== newValue) {
-              const oldValue = currentValue
-              watcherHandler.run(currentValue = newValue, oldValue)
+          set: setter
+        }
+
+        if (prop in this) {
+          let target: any = this
+          
+          while (target) {
+            if (!hasOwnProperty.call(target, prop)) {
+              target = target.__proto__
+              continue
             }
+
+            const ownDescriptor = Object.getOwnPropertyDescriptor(target, prop)
+
+            if (!ownDescriptor.configurable) {
+              return console.warn(
+                'Property `' + prop + '` could not be patched.\n' +
+                'Any property change made directly in element instance won\'t be tracked.'
+              )
+            }
+
+            // Merge addition options
+            for (const option of ['enumerable', 'writable']) {
+              if (ownDescriptor.hasOwnProperty(option)) {
+                descriptor[option] = ownDescriptor[option]
+              }
+            }
+
+            if (!ownDescriptor.get) {
+              currentValue = ownDescriptor.value
+            } else {
+              descriptor.get = function () {
+                return currentValue = ownDescriptor.get.call(this)
+              }
+
+              // Initial current value
+              descriptor.get.call(this)
+
+              if (ownDescriptor.set) {
+                descriptor.set = function (newValue: any) {
+                  ownDescriptor.set.call(this, newValue)
+                  setter(newValue)
+                }
+              }
+            }
+
+            break
           }
-        })
+        }
+
+        Object.defineProperty(this, prop, descriptor)
       })
     }
 
