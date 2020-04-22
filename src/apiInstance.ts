@@ -42,16 +42,16 @@ export interface NovaElementInternals {
   attributeChangedCallback: NovaElementAttributeChangedCallback
 }
 
-export type NovaElementInstance<T extends keyof HTMLElementTagNameMap> = HTMLElementTagNameMap[T] & NovaElementInternals
+export type NovaElementInstance<T extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNameMap> = HTMLElementTagNameMap[T] & NovaElementInternals
 
-let currentElementInstance: NovaElementInstance<any> = null
+let currentElementInstance: NovaElementInstance = null
 
 export function getElementInstance<T extends keyof HTMLElementTagNameMap> (): NovaElementInstance<T> {
   if (!currentElementInstance) {
     throw new Error('Unknown instance')
   }
 
-  return currentElementInstance
+  return currentElementInstance as any
 }
 
 export function setElementInstance<T extends keyof HTMLElementTagNameMap> (instance: NovaElementInstance<T> | null) {

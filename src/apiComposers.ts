@@ -4,31 +4,40 @@ import {
   NovaElementInstance,
   context
 } from './apiInstance'
+import { WatcherHandler } from './WatcherHandler'
 
-export type NovaElementMethodDefinition = (...args: unknown[]) => unknown
-export type NovaElementMethodDefinitionBound = (this: NovaElementInstance<any>, ...args: unknown[]) => unknown
+export type NovaElementMethodDefinition = (...args: unknown[]) => any
 
 export const onConnected = getCallbackComposer('connected')
 export const onDisconnected = getCallbackComposer('disconnected')
 export const onAttributeChanged = getCallbackComposer('attributeChanged')
 export const onAdopted = getCallbackComposer('adopted')
 
-export function attr (name: string) {
+export interface WatchableValue<T> {
+  value: T
+  watch: WatcherHandler['addWatcher']
+}
+
+export type RemoveEventListenerFn = () => void
+
+export function attr<T extends string> (name: string): WatchableValue<T> {
   const instance = getElementInstance()
   const watcherHandler = instance.__registerWatchedAttr(name)
 
   return {
     get value () {
-      return instance.getAttribute(name)
+      return instance.getAttribute(name) as any
     },
-    set value (newValue: string) {
+    set value (newValue: T) {
       instance.setAttribute(name, newValue)
     },
     watch: watcherHandler.addWatcher.bind(watcherHandler)
   }
 }
 
-export function prop (name: PropertyKey, defaultValue?: any) {
+export function prop<K extends keyof NovaElementInstance, T extends NovaElementInstance[K]> (name: K, defaultValue?: T): WatchableValue<T>
+export function prop<T> (name: PropertyKey, defaultValue?: T): WatchableValue<T>
+export function prop<T> (name: PropertyKey, defaultValue?: T): WatchableValue<T> {
   const instance = getElementInstance()
   const watcherHandler = instance.__registerWatchedProp(name, defaultValue)
 
@@ -36,19 +45,17 @@ export function prop (name: PropertyKey, defaultValue?: any) {
     get value () {
       return instance[name]
     },
-    set value (newValue: unknown) {
+    set value (newValue: T) {
       instance[name] = newValue
     },
     watch: watcherHandler.addWatcher.bind(watcherHandler)
   }
 }
 
-export function method (fn: NovaElementMethodDefinition): NovaElementMethodDefinitionBound
-export function method (methodName: string, fn?: NovaElementMethodDefinition): NovaElementMethodDefinitionBound
-export function method (
-  methodNameOrFn: string | NovaElementMethodDefinition, 
-  fn?: NovaElementMethodDefinition
-): NovaElementMethodDefinitionBound {
+export function method<T extends NovaElementMethodDefinition> (fn: T): T
+export function method<K extends keyof NovaElementInstance> (methodName: K | string): NovaElementInstance[K] | NovaElementMethodDefinition
+export function method<T extends NovaElementMethodDefinition> (methodName: string, fn: T): T
+export function method<T extends NovaElementMethodDefinition> (methodNameOrFn: string | T, fn?: T): T {
   const instance = getElementInstance()
 
   let methodName: string
@@ -71,16 +78,21 @@ export function method (
   return (instance[methodName] = context(fn)).bind(instance)
 }
 
-export function on <K extends keyof HTMLElementEventMap>(
+export function on<K extends keyof HTMLElementEventMap> (
   type: K, 
   listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, 
   options?: boolean | AddEventListenerOptions
-): () => void
-export function on (
-  type: string, 
+): RemoveEventListenerFn
+export function on<K extends keyof HTMLElementEventMap> (
+  type: K,
+  listener: EventListenerObject, 
+  options?: boolean | AddEventListenerOptions
+): RemoveEventListenerFn
+export function on<K extends keyof HTMLElementEventMap> (
+  type: K,
   listener: EventListenerOrEventListenerObject, 
   options?: boolean | AddEventListenerOptions
-): () => void {
+): RemoveEventListenerFn {
   const instance = getElementInstance()
 
   /* istanbul ignore next */

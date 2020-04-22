@@ -59,7 +59,6 @@ describe('api: composers', () => {
     method(doSomething)
 
     toggle()
-    
 
     expect(() => method('unknownMethod')).toThrowError('Unknown method: unknownMethod')
 
