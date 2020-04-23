@@ -147,10 +147,10 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
 
         if (prop in this) {
           let target: any = this
-          
+
           while (target) {
             if (!hasOwnProperty.call(target, prop)) {
-              target = target.__proto__
+              target = Object.getPrototypeOf(target)
               continue
             }
 
