@@ -1,13 +1,14 @@
 import { WatcherHandler } from './WatcherHandler'
 import { WatcherCollection } from './WatcherCollection'
 
+export type NovaElementCallbackDetachFn = () => void
 export type NovaElementConnectedCallback = () => void
 export type NovaElementDisconnectedCallback = () => void
 export type NovaElementAdoptedCallback = (oldDocument: Document, newDocument: Document) => void
 export type NovaElementAttributeChangedCallback = (
-  name: string, 
-  oldValue: string | null, 
-  newValue: string | null, 
+  name: string,
+  oldValue: string | null,
+  newValue: string | null,
   domain: string
 ) => void
 
@@ -35,7 +36,7 @@ export interface NovaElementInternals {
 
   __registerWatchedAttr: (attr: string) => WatcherHandler
   __registerWatchedProp: (prop: PropertyKey, defaultValue?: any) => WatcherHandler
-  __attachCallback: <T extends keyof NovaElementCallbacks>(callbackName: T, fn: NovaElementCallbacks[T]) => () => void
+  __attachCallback: <T extends keyof NovaElementCallbacks>(callbackName: T, fn: NovaElementCallbacks[T]) => NovaElementCallbackDetachFn
   connectedCallback: NovaElementConnectedCallback
   disconnectedCallback: NovaElementDisconnectedCallback
   adoptedCallback: NovaElementAdoptedCallback
