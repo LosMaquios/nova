@@ -20,19 +20,18 @@ export interface WatchableValue<T> {
 
 export type RemoveEventListenerFn = () => void
 
-export function attr<T extends string> (name: string): WatchableValue<T> {
+export function attr (name: string): WatchableValue<string> {
   const instance = getElementInstance()
   const watcherHandler = instance.__registerWatchedAttr(name)
 
-  return {
-    get value () {
+ return createWatchableValue<string>(watcherHandler, {
+    get () {
       return instance.getAttribute(name) as any
     },
-    set value (newValue: T) {
+    set (newValue) {
       instance.setAttribute(name, newValue)
-    },
-    watch: watcherHandler.addWatcher.bind(watcherHandler)
-  }
+    }
+  })
 }
 
 export function prop<K extends keyof NovaElementInstance, T extends NovaElementInstance[K]> (name: K, defaultValue?: T): WatchableValue<T>
@@ -41,15 +40,14 @@ export function prop<T> (name: PropertyKey, defaultValue?: T): WatchableValue<T>
   const instance = getElementInstance()
   const watcherHandler = instance.__registerWatchedProp(name, defaultValue)
 
-  return {
-    get value () {
+  return createWatchableValue<T>(watcherHandler, {
+    get () {
       return instance[name]
     },
-    set value (newValue: T) {
+    set (newValue) {
       instance[name] = newValue
-    },
-    watch: watcherHandler.addWatcher.bind(watcherHandler)
-  }
+    }
+  })
 }
 
 export function method<T extends NovaElementMethodDefinition> (fn: T): T
@@ -80,7 +78,7 @@ export function method<T extends NovaElementMethodDefinition> (methodNameOrFn: s
 
 export function on<K extends keyof HTMLElementEventMap> (
   type: K, 
-  listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, 
+  listener: EventListener, 
   options?: boolean | AddEventListenerOptions
 ): RemoveEventListenerFn
 export function on<K extends keyof HTMLElementEventMap> (
@@ -90,7 +88,7 @@ export function on<K extends keyof HTMLElementEventMap> (
 ): RemoveEventListenerFn
 export function on<K extends keyof HTMLElementEventMap> (
   type: K,
-  listener: EventListenerOrEventListenerObject, 
+  listener: EventListenerOrEventListenerObject,
   options?: boolean | AddEventListenerOptions
 ): RemoveEventListenerFn {
   const instance = getElementInstance()
@@ -106,6 +104,21 @@ export function on<K extends keyof HTMLElementEventMap> (
   return () => {
     instance.removeEventListener(type, listener, options)
   }
+}
+
+function createWatchableValue<T> (
+  watcherHandler: WatcherHandler, 
+  descriptor: { get: () => T, set: (newValue: T) => void }
+): WatchableValue<T> {
+  return Object.seal({
+    get value () {
+      return descriptor.get()
+    },
+    set value (newValue: T) {
+      descriptor.set(newValue)
+    },
+    watch: watcherHandler.addWatcher.bind(watcherHandler)
+  })
 }
 
 function getCallbackComposer<T extends keyof NovaElementCallbacks> (callbackName: T) {
