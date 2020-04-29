@@ -1,4 +1,10 @@
-import { defineElement, getElementInstance, NovaElementInstance } from '../src'
+import { 
+  defineElement, 
+  getElementInstance, 
+  NovaElementInstance, 
+  DefineOptions, 
+  context
+} from '../src'
 
 let elementCount = 0
 
@@ -6,17 +12,22 @@ export const runInInstance = (
   runner: <T extends keyof HTMLElementTagNameMap>(
     instance: NovaElementInstance<T>, 
     done: jest.DoneCallback
-  ) => void
+  ) => void,
+  attrs: DefineOptions['observedAttributes'] = []
 ): jest.ProvidesCallback => {
   return done => {
     function TestElement () {
       const instance = getElementInstance()
-      runner(instance, done)
+      const runnerContext = context(runner)
+
+      setTimeout(() => {
+        runnerContext(instance, done)
+      })
     }
 
     const tag = `test-element-${++elementCount}`
 
-    defineElement(TestElement, { tag })
+    defineElement(TestElement, { tag, observedAttributes: attrs })
     document.createElement(tag)
   }
 }

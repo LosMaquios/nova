@@ -6,8 +6,6 @@ import {
   onConnected, 
   onDisconnected, 
   onAttributeChanged,
-  defineElement,
-  getElementInstance,
   onAdopted
 } from '../src'
 import { runInInstance } from './utils'
@@ -26,9 +24,7 @@ describe('api: composers', () => {
       done()
     })
 
-    setTimeout(() => {
-      id.value = NEW_ID
-    })
+    id.value = NEW_ID
   }))
 
   test('composer `prop`', runInInstance((instance, done) => {
@@ -62,16 +58,14 @@ describe('api: composers', () => {
 
     expect(() => method('unknownMethod')).toThrowError('Unknown method: unknownMethod')
 
-    setTimeout(() => {
-      setAttribute('id', 'test')
+    setAttribute('id', 'test')
 
-      ;(instance as any).toggle()
-      ;(instance as any).doSomething()
-  
-      expect(instance.getAttribute('id')).toBe('test')
-      expect(toggleSpy).toBeCalledTimes(2)
-      done()
-    })
+    ;(instance as any).toggle()
+    ;(instance as any).doSomething()
+
+    expect(instance.getAttribute('id')).toBe('test')
+    expect(toggleSpy).toBeCalledTimes(2)
+    done()
   }))
 
   test('composer `on`', runInInstance((instance, done) => {
@@ -97,53 +91,41 @@ describe('api: composers', () => {
   test('composer `onConnected`', runInInstance((instance, done) => {
     onConnected(done)
 
-    setTimeout(() => {
-      document.body.append(instance)
-    })
+    // Dispatch connected
+    document.body.append(instance)
   }))
 
   test('composer `onDisconnected`', runInInstance((instance, done) => {
     onDisconnected(done)
 
+    const { body } = document
+
+    body.append(instance)
+
     setTimeout(() => {
-      const { body } = document
-
-      body.append(instance)
-
-      setTimeout(() => {
-        body.removeChild(instance)
-      })
+      body.removeChild(instance)
     })
   }))
 
-  test('composer `onAttributeChanged`', done => {
-    function TestAttributeChanged () {
-      let unwatchChanged
+  test('composer `onAttributeChanged`', runInInstance((instance, done) => {
+    let unwatchChanged
       
-      const instance = getElementInstance()
-      const attributeChangedSpy = jest.fn(() => unwatchChanged())
+    const attributeChangedSpy = jest.fn(() => unwatchChanged())
+    unwatchChanged = onAttributeChanged(attributeChangedSpy)
 
-      unwatchChanged = onAttributeChanged(attributeChangedSpy)
+    instance.setAttribute('id', 'some-id')
 
-      setTimeout(() => {
-        instance.setAttribute('id', 'some-id')
+    expect(attributeChangedSpy).toBeCalledWith(
+      'id', // name
+      null, // oldValue
+      'some-id', // newValue
+      null // domain
+    )
 
-        expect(attributeChangedSpy).toBeCalledWith(
-          'id', // name
-          null, // oldValue
-          'some-id', // newValue
-          null // domain
-        )
-
-        instance.setAttribute('id', 'not-tracked-id')
-        expect(attributeChangedSpy).toBeCalledTimes(1)
-        done()
-      })
-    }
-
-    defineElement(TestAttributeChanged, { observedAttributes: ['id'] })
-    document.createElement('test-attribute-changed')
-  })
+    instance.setAttribute('id', 'not-tracked-id')
+    expect(attributeChangedSpy).toBeCalledTimes(1)
+    done()
+  }, ['id']))
 
   test('composer `onAdopted`', runInInstance((instance, done) => {
     const currentDocument = instance.ownerDocument
@@ -157,8 +139,6 @@ describe('api: composers', () => {
       done()
     })
 
-    setTimeout(() => {
-      nextDocument.adoptNode(instance)
-    })
+    nextDocument.adoptNode(instance)
   }))
 })
