@@ -8,46 +8,73 @@ import { WatcherHandler } from './WatcherHandler'
 
 export type NovaElementMethodDefinition = (...args: unknown[]) => any
 
+export interface WatchableValue<K, V> {
+  name: K
+  value: V
+}
+
+export type UnwatchFn = () => void
+export type RemoveEventListenerFn = () => void
+
 export const onConnected = getCallbackComposer('connected')
 export const onDisconnected = getCallbackComposer('disconnected')
 export const onAttributeChanged = getCallbackComposer('attributeChanged')
 export const onAdopted = getCallbackComposer('adopted')
 
-export interface WatchableValue<T> {
-  value: T
-  watch: WatcherHandler['addWatcher']
-}
-
-export type RemoveEventListenerFn = () => void
-
-export function attr (name: string): WatchableValue<string> {
+export function attr (name: string): WatchableValue<string, string> {
   const instance = getElementInstance()
-  const watcherHandler = instance.__registerWatchedAttr(name)
+  
+  // Register attr
+  instance.__registerWatchedAttr(name)
 
- return createWatchableValue<string>(watcherHandler, {
-    get () {
+  return Object.seal({
+    name,
+    get value () {
       return instance.getAttribute(name) as any
     },
-    set (newValue) {
+    set value (newValue: string) {
       instance.setAttribute(name, newValue)
     }
   })
 }
 
-export function prop<K extends keyof NovaElementInstance, T extends NovaElementInstance[K]> (name: K, defaultValue?: T): WatchableValue<T>
-export function prop<T> (name: PropertyKey, defaultValue?: T): WatchableValue<T>
-export function prop<T> (name: PropertyKey, defaultValue?: T): WatchableValue<T> {
+export function prop<K extends keyof NovaElementInstance, T extends NovaElementInstance[K]> (name: K, defaultValue?: T): WatchableValue<K, T>
+export function prop<T> (name: PropertyKey, defaultValue?: T): WatchableValue<PropertyKey, T>
+export function prop<T> (name: PropertyKey, defaultValue?: T): WatchableValue<PropertyKey, T> {
   const instance = getElementInstance()
-  const watcherHandler = instance.__registerWatchedProp(name, defaultValue)
+  
+  // Register prop
+  instance.__registerWatchedProp(name, defaultValue)
 
-  return createWatchableValue<T>(watcherHandler, {
-    get () {
+  return Object.seal({
+    name,
+    get value () {
       return instance[name]
     },
-    set (newValue) {
+    set value (newValue: T) {
       instance[name] = newValue
     }
   })
+}
+
+export function watch (
+  value: WatchableValue<PropertyKey, any>,
+  watchFn: (newValue: any, oldValue: any) => void
+): UnwatchFn {
+  let watcherHandler: WatcherHandler
+  const instance = getElementInstance()
+
+  if (typeof value.name === 'string') {
+    watcherHandler = instance.__watchedAttrs.forceGet(value.name)
+  }
+
+  watcherHandler = watcherHandler ?? instance.__watchedProps.forceGet(value.name)
+
+  if (!watcherHandler) {
+    throw new Error('Given `value` is not watchable')
+  }
+
+  return watcherHandler.addWatcher(watchFn)
 }
 
 export function method<T extends NovaElementMethodDefinition> (fn: T): T
@@ -104,21 +131,6 @@ export function on<K extends keyof HTMLElementEventMap> (
   return () => {
     instance.removeEventListener(type, listener, options)
   }
-}
-
-function createWatchableValue<T> (
-  watcherHandler: WatcherHandler, 
-  descriptor: { get: () => T, set: (newValue: T) => void }
-): WatchableValue<T> {
-  return Object.seal({
-    get value () {
-      return descriptor.get()
-    },
-    set value (newValue: T) {
-      descriptor.set(newValue)
-    },
-    watch: watcherHandler.addWatcher.bind(watcherHandler)
-  })
 }
 
 function getCallbackComposer<T extends keyof NovaElementCallbacks> (callbackName: T) {

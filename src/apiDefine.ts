@@ -65,8 +65,8 @@ function getCustomElementConstructor<T extends keyof HTMLElementTagNameMap> (
     __id: string
     __mutationObserver: MutationObserver
     __constructor = FunctionalElementConstructor
-    __watchedAttrs = new WatcherCollection()
-    __watchedProps = new WatcherCollection()
+    __watchedAttrs = new WatcherCollection<string>()
+    __watchedProps = new WatcherCollection<PropertyKey>()
     __callbacks = new WatcherCollection<keyof NovaElementCallbacks>()
 
     constructor () {

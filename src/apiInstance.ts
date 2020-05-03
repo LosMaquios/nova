@@ -30,8 +30,8 @@ export interface NovaElementInternals {
   __id: string
   __mutationObserver: MutationObserver
   __constructor: NovaFunctionalElementConstructor
-  __watchedAttrs: WatcherCollection
-  __watchedProps: WatcherCollection
+  __watchedAttrs: WatcherCollection<string>
+  __watchedProps: WatcherCollection<PropertyKey>
   __callbacks: WatcherCollection<keyof NovaElementCallbacks>
 
   __registerWatchedAttr: (attr: string) => WatcherHandler

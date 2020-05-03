@@ -6,7 +6,8 @@ import {
   onConnected, 
   onDisconnected, 
   onAttributeChanged,
-  onAdopted
+  onAdopted,
+  watch
 } from '../src'
 import { runInInstance } from './utils'
 
@@ -17,7 +18,7 @@ describe('api: composers', () => {
 
     expect(id.value).toBeNull()
 
-    id.watch((newID, oldID) => {
+    watch(id, (newID, oldID) => {
       expect(oldID).toBeNull()
       expect(newID).toBe(NEW_ID)
       expect(instance.getAttribute('id')).toBe(NEW_ID)
@@ -36,7 +37,7 @@ describe('api: composers', () => {
     expect(active.value).toBe(false)
     expect((instance as any).active).toBe(false)
 
-    active.watch((newActive, oldActive) => {
+    watch(active, (newActive, oldActive) => {
       expect(oldActive).toBe(false)
       expect(newActive).toBe(NEW_ACTIVE)
       expect((instance as any).active).toBe(NEW_ACTIVE)

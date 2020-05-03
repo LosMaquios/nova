@@ -1,6 +1,6 @@
 import { WatcherHandler } from './WatcherHandler'
 
-export class WatcherCollection<K = string> extends Map<K, WatcherHandler> {
+export class WatcherCollection<K> extends Map<K, WatcherHandler> {
   forceGet (name: K) {
     return super.get(name)
   }
