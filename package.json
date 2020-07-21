@@ -27,7 +27,7 @@
   "homepage": "https://github.com/LosMaquios/nova#readme",
   "devDependencies": {
     "@types/jest": "^25.1.4",
-    "codecov": "^3.6.5",
+    "codecov": "^3.7.1",
     "jest": "^25.2.4",
     "jest-environment-jsdom-sixteen": "^1.0.3",
     "rollup": "^2.3.2",
